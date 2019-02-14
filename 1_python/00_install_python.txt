@@ -4,7 +4,7 @@ To setup your computer to write programs using the python programming language (
 
 	https://www.anaconda.com/download/
 
-- Install the distribution in your home directory. You should not need any admin privileges for this.
+- Install the distribution in your home directory. You do not need any admin privileges for this.
 
 
 To start the Jupyter notebook:
