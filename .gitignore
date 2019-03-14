@@ -112,3 +112,6 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# scikit-learn datasets
+4_scikit-learn/datasets/
