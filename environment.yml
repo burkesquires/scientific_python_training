@@ -1,4 +1,4 @@
-name: bios8366
+name: sci_python
 
 channels:
  - conda-forge
@@ -9,35 +9,28 @@ dependencies:
 - autograd
 - basemap
 - bokeh
-- cython
-- dask
 - ipython
 - jupyter
 - jupyterlab
-- keras
 - notebook
 - ipyparallel
 - ipywidgets
 - jupyter_client
 - jupyter_core
-- line_profiler
-- numexpr
-- numba
 - numpy
 - pandas
 - patsy
 - pillow
-- pip
 - pprofile
 - python-graphviz
+- pydot
+- pyparsing
+- pyzmq
 - rpy2  
 - scikit-learn
 - scipy
 - seaborn
 - snakeviz
-- sympy
-- tensorflow
-- theano
-- xgboost
 - xlrd
-- pymc3
+- pip
+    - yellowbrick
