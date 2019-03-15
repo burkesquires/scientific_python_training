@@ -8,6 +8,7 @@ dependencies:
 - python=3.6
 - autograd
 - basemap
+- beautifulsoup4
 - bokeh
 - ipython
 - jupyter
@@ -17,6 +18,8 @@ dependencies:
 - ipywidgets
 - jupyter_client
 - jupyter_core
+- lxml
+- networkx
 - numpy
 - pandas
 - patsy
@@ -28,9 +31,19 @@ dependencies:
 - pyzmq
 - rpy2  
 - scikit-learn
+- scikit-image
 - scipy
 - seaborn
+- six
 - snakeviz
+- sympy
+- toolz
 - xlrd
 - pip:
     - yellowbrick
+	# not available on conda, so use pip
+	- notedown>=1.5
+	- jupytercontrib>=0.0.5
+	- bs4
+	# need improvements from master branch
+	- git+https://github.com/networkx/networkx.git

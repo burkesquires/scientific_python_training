@@ -1,0 +1,45 @@
+box: elegantscipy/elegantscipy
+
+build:
+  steps:
+    - script:
+        name: Display Python information
+        code: |
+          echo "python version $(python --version) running"
+          echo "pip version $(pip --version) running"
+
+    - magyarjeti/locale:
+        locale: en_US
+        charset: UTF-8
+
+    - pip-install:
+        pip_commands: pip3
+        extra_args: "--upgrade"
+
+    - script:
+        name: build book
+        code: |
+          mv /data/* ./data
+          make zip
+
+    - script:
+        name: build HTMLBook
+        code: |
+          make htmlbook
+
+deploy:
+  steps:
+    - script:
+        name: Use Python 2 for deployment
+        code: |
+          ln -sf /usr/bin/python2.7 /usr/bin/python
+
+    # Uploaded to https://storage.cloud.google.com/elegant-scipy-proofs/
+    - michilu/gcs-website-deploy:
+        bucket: elegant-scipy-proofs
+        project: $GOOGLE_PROJECT_ID
+        token: $GOOGLE_REFRESH_TOKEN
+        dir: html
+
+# See http://www.wllnr.nl/blog/2016/02/automatic-deployment-using-wrecker/
+# for more on GCS deployment

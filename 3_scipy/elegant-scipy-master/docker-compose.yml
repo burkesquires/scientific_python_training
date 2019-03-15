@@ -1,0 +1,8 @@
+book_builder:
+  build: docker
+  volumes:
+    - .:/repo
+  working_dir: /repo
+  command: >
+      bash -c "pip install --upgrade -r requirements.txt && make"
+

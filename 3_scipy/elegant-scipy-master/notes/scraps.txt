@@ -1,0 +1,432 @@
+================== Chapter 1 ===================
+
+## Making a class boxplot using seaborn:
+
+```
+import itertools as it
+from collections import defaultdict
+
+import seaborn.apionly as sns
+
+def restyle_boxplot(self, artist_dict, color, props):
+    """Change color of certain elements according to class.
+
+    This function money-patches seaborn's, which messes too
+    much with the styling.
+    """
+    for box in artist_dict["boxes"]:
+        box.update(dict(facecolor=color + (0.05,),
+                        edgecolor=color))
+    for whisk in artist_dict["whiskers"]:
+        whisk.update(dict(color=color))
+    for fly in artist_dict["fliers"]:
+        fly.update(dict(markeredgecolor=color))
+
+sns.categorical._BoxPlotter.restyle_boxplot = restyle_boxplot
+
+
+def class_boxplot(data, samples, classes):
+    """Make a boxplot with boxes colored according to the class they belong to.
+
+    Parameters
+    ----------
+    data : (distributions, samples) shape array of float
+        The input data. One boxplot will be generated for each element
+        in `data`.
+    samples : array of int
+        sample ID of each column of `data`
+    classes : list of string, same length as `data`
+        The class each distribution in `data` belongs to.
+    """
+    data = np.array(data)
+    samples = np.broadcast_to(samples, data.shape)
+    classes = np.broadcast_to(classes, data.shape)
+    df = pd.DataFrame({'class': np.ravel(classes),
+                       'sample': np.ravel(samples),
+                       'values': np.ravel(data)})
+    sns.boxplot(data=df, x='sample', y='values', hue='class')
+```
+
+================== Chapter 4 ===================
+
+## Notes
+
+- Windowing introduction (no detail given)
+
+- fft/ifft (1D) [timing on real vs complex sequence -> rfft
+- dct (1D)
+  - compressed sensing
+    http://www.mathworks.com/company/newsletters/articles/clevescorner-compressed-sensing.html
+
+- fft2/ifft2 (2D)
+  - example: image notch filter
+    https://miac.unibas.ch/SIP/06-Restoration.html
+  - spectral method to solve, e.g., Poisson equation
+    See arXiv:1111.4971, "On FFT-based convolutions and correlations, with
+    application to solving Poisson’s equation in an open
+    rectangular pipe" by R. Ryne
+
+- fftn/ifftn (3D)
+ - Phase correlation from skimage
+
+- convolution types: numpy, ndimage, signal.convolve, signal.fftconvolve
+
+- Other ideas:
+
+  - Shape matching
+  - Image filtering
+  - skimage template matching
+
+
+To construct an array such as the above from scratch, one would first
+set up the appropriate dtype:
+
+```python
+dt = np.dtype([('time', np.uint64),
+               ('size', np.uint32),
+               ('position', [('az', np.float32),
+               ('el', np.float32),
+               ('region_type', np.uint8),
+               ('region_ID', np.uint16)]),
+               ('gain', np.uint8),
+               ('samples', (np.int16, 2048))])
+```
+
+The dtype can then be used to create an array, which we can later fill
+with values:
+
+```python
+data = np.zeros(500, dtype=dt)  # Construct array with 500 measurements
+```
+
+
+================== Chapter 5 ===================
+
+S: Note to self: the outline image can also be read from the archive at
+
+https://github.com/BIDS/BSDS500/blob/master/BSDS500/data/groundTruth/train/108073.mat
+
+and then loaded using
+
+```
+from scipy import io
+f = io.loadmat('108073.mat')
+outline = f['groundTruth'][0, 3]['Boundaries'][0, 0]
+# ^ 3 refers to third segmentation, the one previously used in this
+example
+
+# I can also convert all the .mat files in the archive to .png files,
+# if needed
+```
+
+================== Chapter 6 ===================
+
+## Linear algebra for community detection
+
+Moving on from PageRank, we will now demonstrate another use of the
+eigendecomposition available in SciPy.
+
+We saw a hint in the introduction to this chapter that the Fiedler vector could
+be used to detect "communities" in networks, groups of nodes that are tightly
+connected to each other but not so much to nodes in other groups.
+Mark Newman published a
+[seminal paper](http://www.pnas.org/content/103/23/8577.short)
+on the topic in 2006, and
+[refined it further](http://arxiv.org/abs/1307.7729) in 2013. We'll apply it
+to the Python library dependency graph, which will tell us whether Python users
+fall into two or more somewhat independent groups.
+
+We've downloaded and preprocessed dependency data from PyPI,
+available as the file `pypi-dependencies.txt` in the `data/`
+folder. The data file consists of a list of library-dependency pairs,
+one per line, e.g. ``scipy numpy``. The networkx library that we
+started using in Chapter 3 makes it easy to build a graph from these
+data. We will use a directed graph since the relationship is
+asymmetrical: one library depends on the other, not vice-versa.
+
+```python
+import networkx as nx
+
+dependencies = nx.DiGraph()
+
+with open('data/pypi-deps.txt') as lines:
+    lib_dep_pairs = (str.split(line) for line in lines)
+    dependencies.add_edges_from(lib_dep_pairs)
+```
+
+We can then get some statistics about this dataset by using
+networkx's built-in functions:
+
+```python
+print('Number of packages: ', dependencies.number_of_nodes())
+print('Total number of dependencies: ', dependencies.number_of_edges())
+```
+
+What is the single most used Python package?
+
+```python
+print(max(dependencies.in_degree_iter(),
+          key=lambda x: x[1]))
+```
+
+We're not going to cover it in this book, but `setuptools` is not a
+surprising winner here. It probably belongs in the Python standard
+library, in the same category as `os`, `sys`, and others!
+
+Since using setuptools is almost a requirement for being listed in PyPI, we
+will remove it from the dataset, given its undue influence
+on the shape of the graph.
+
+```python
+dependencies.remove_node('setuptools')
+```
+
+What's the next most depended-upon package?
+
+```python
+print(max(dependencies.in_degree_iter(),
+          key=lambda x: x[1]))
+```
+
+The requests library is the foundation of a very large fraction of the web
+frameworks and web processing libraries.
+
+We can similarly find the top-40 most depended-upon packages:
+
+```python
+packages_by_in = sorted(dependencies.in_degree_iter(),
+                        key=lambda x: x[1], reverse=True)
+for i, p in enumerate(packages_by_in, start=1):
+    print(i, '. ', p[0], p[1])
+    if i > 40:
+        break
+```
+
+By this ranking, NumPy ranks 4 and SciPy 27 out of all of PyPI. Not
+bad!  Overall, though, one gets the impression that the web community
+dominates PyPI. As also mentioned in the preface, this is not
+altogether surprising: the scientific Python community is still young
+and growing, and web tools are arguably of more generic application.
+
+Let's see whether we can isolate the scientific community.
+
+Because it's unwieldy to draw 90,000 nodes, we are only going to draw a
+fraction of PyPI, following the same ideas we used for the worm brain.
+Let's look at the top 10,000 packages in PyPI, according to number
+of dependencies:
+
+```python
+n = 10000
+top_names = [p[0] for p in packages_by_in[:n]]
+top_subgraph = nx.subgraph(dependencies, top_names)
+Dep = nx.to_scipy_sparse_matrix(top_subgraph, nodelist=top_names)
+```
+
+As above, we need the connectivity matrix, the symmetric version of the
+adjacency matrix:
+
+```python
+Conn = (Dep + Dep.T) / 2
+```
+
+And the diagonal matrix of its degrees, as well as its inverse-square-root:
+
+```python
+degrees = np.ravel(Conn.sum(axis=0))
+Deg = sparse.diags(degrees).tocsr()
+Dinv2 = sparse.diags(degrees ** (-.5)).tocsr()
+```
+
+From this we can generate the Laplacian of the dependency graph:
+
+```python
+Lap = Deg - Conn
+```
+
+We can then generate an affinity view of these nodes, as shown above for
+the worm brain graph. We just need the second and third smallest eigenvectors
+of the *affinity matrix*, the degree-normalized version of the Laplacian. We
+can use `sparse.linalg.eigsh` to obtain these.
+
+Note that eigenvectors here are calculated through an iterative
+method, for which the convergence may depend on the starting vector
+``v0``.  By default, this vector is chosen at random, but we set it
+explicitly to all ones to ensure *reliable* convergence.
+
+```python
+I = sparse.eye(Lap.shape[0], format='csr')
+sigma = 0.5
+
+Affn = Dinv2 @ Lap @ Dinv2
+v0 = np.ones(Lap.shape[0])
+
+eigvals, vec = sparse.linalg.eigsh(Affn + sigma*I, k=3, which='SM', v0=v0)
+
+sorted_indices = np.argsort(eigvals)
+eigvals = eigvals[sorted_indices]
+vec = vec[:, sorted_indices]
+
+_ignored, x, y = (Dinv2 @ vec).T
+```
+
+That should give us a nice layout for our Python packages!
+
+```python
+plt.figure()
+plt.scatter(x, y)
+```
+
+That's looking promising! But, obviously, this plot is missing some critical
+details! Which packages depend on which? Where are the most important packages?
+Perhaps most critically, do particular packages naturally belong together?
+In the worm brain, we had prior information about neuron types that helped us
+to make sense of the graph. Let's try to infer some similar information about
+PyPI packages.
+
+In the same way that the eigen-decomposition of the Laplacian matrix can tell
+us about graph layout, it can also tell us about connectivity.
+
+Aim: graph of top Python packages:
+- colored by community
+- sized by dependencies
+- alpha-d by pagerank
+- laid out by spectral affinity
+
+<!-- exercise begin -->
+
+**Exercise:** While we were writing this chapter, we started out by computing
+pagerank on the graph of Python dependencies. We eventually found that we could
+not get nice results with this graph. The correlation between in-degree and
+pagerank was much higher than in other datasets, and the few outliers didn't
+make much sense to us.
+
+Can you think of some reasons why pagerank might not be the best
+measure of importance for the Python dependency graph?
+
+<!-- solution begin -->
+
+**Solution:**
+
+Here's our theories. Yours might be different!
+
+First, the graph of dependencies is fundamentally different to the web. In the
+web, important pages reinforce each other: the Wikipedia pages for Newton's
+theory of gravitation and Einstein's theory of general relativity link to each
+other. Thus, our hypothetical Webster has some probability of bouncing between
+them. In contrast, Python dependencies form a directed acyclic graph (DAG).
+Whenever Debbie (our hypothetical dependency browser) arrives at a foundational
+package such as NumPy, she is instantly transported to a random package,
+instead of staying in the field of similar packages.
+
+Second, the DAG of dependencies is shallow: libraries will depend on, for
+example, scikit-learn, which depends on scipy, which depends on numpy, and
+that's it. Therefore, there is not much room for important packages to link to
+other important packages. The hierarchy is flat, and the importance is captured
+by the direct dependencies.
+
+Third, scientific programming itself is particularly prone to that flat
+hierarchy problem, more so than e.g. web frameworks, because scientists are
+doing the programming, rather than professional coders. In particular, a
+scientific analysis might end up in a script attached to a paper, or a Jupyter
+notebook, rather than another library on PyPI. We hope that this book will
+encourage more scientists to write great code that others can reuse, and put it
+on PyPI!
+
+<!-- solution end -->
+
+<!-- exercise end -->
+
+
+================== Chapter 7 ===================
+
+
+* Pluim et al., Image registration by maximization of combined mutual
+  information and gradient information, IEEE Transactions on Medical
+  Imaging, 19(8) 2000
+
+and
+
+* Pluim et al., Mutual-Information-Based Registration of Medical
+  Images: A Survey, IEEE Transactions on Medical Imaging, 22(8) 2003
+
+
+## Registration in human brain imaging
+
+This brings us to our final optimization in this chapter: aligning brain
+images taken with extremely different techniques. MRI and PET imaging are
+so different, that even normalized mutual information is insufficient for
+some alignments.
+
+```python
+#TODO: attempt to align multimodal 3D images with NMI
+```
+
+In their 2000 paper, Pluim *et al.* showed that you can improve the properties
+of the cost function by adding *gradient* information to the NMI metric. In
+short, they measure the gradients magnitude and direction in both images (think
+back to Chapter 3 and the Sobel filter), and score highly where the gradients
+align, meaning they point in similar or opposite directions, but not at sharp
+angles to each other.
+
+```python
+def gradient(image, sigma=1):
+    gaussian_filtered = ndi.gaussian_filter(image, sigma=sigma,
+                                            mode='constant', cval=0)
+    return np.gradient(gaussian_filtered)
+
+
+def gradient_norm(g):
+    return np.linalg.norm(g, axis=-1)
+
+
+def gradient_similarity(A, B, sigma=1, scale=True):
+    """For each pixel, calculate the angle between the gradients of A & B.
+
+    Parameters
+    ----------
+    A, B : ndarray
+        Images.
+    sigma : float
+        Sigma for the Gaussian filter, used to calculate the image gradient.
+
+    Notes
+    -----
+    In multi-modal images, gradients may often be similar but point
+    in opposite directions.  This weighting function compensates for
+    that by mapping both 0 and pi to 1.
+
+    Different imaging modalities can highlight different structures.  We
+    are only interested in edges that occur in both images, so we scale the
+    similarity by the minimum of the two gradients.
+
+    """
+    g_A = np.dstack(gradient(A, sigma=sigma))
+    g_B = np.dstack(gradient(B, sigma=sigma))
+
+    mag_g_A = gradient_norm(g_A)
+    mag_g_B = gradient_norm(g_B)
+
+    alpha = np.arccos(np.sum(g_A * g_B, axis=-1) /
+                        (mag_g_A * mag_g_B))
+
+    # Transform the alpha so that gradients that point in opposite directions
+    # count as the same angle
+    w = (np.cos(2 * alpha) + 1) / 2
+
+    w[np.isclose(mag_g_A, 0)] = 0
+    w[np.isclose(mag_g_B, 0)] = 0
+
+    return w * np.minimum(mag_g_A, mag_g_B)
+
+
+def alignment(A, B, sigma=1.5):
+    I = normalized_mutual_information(A, B)
+    G = np.sum(gradient_similarity(A, B, sigma=sigma))
+
+    return I * G
+```
+
+```python
+# TODO: align brain images with this alignment similarity function
+```
+
