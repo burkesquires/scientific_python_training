@@ -38,8 +38,8 @@ dependencies:
 - toolz
 - xlrd
 - pip:
-	- yellowbrick
-	- notedown>=1.5
-	- jupytercontrib>=0.0.5
-	- bs4
-	- git+https://github.com/networkx/networkx.git
+    - yellowbrick
+    - notedown>=1.5
+    - jupytercontrib>=0.0.5
+    - bs4
+    - git+https://github.com/networkx/networkx.git
