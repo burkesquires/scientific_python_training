@@ -24,10 +24,9 @@ dependencies:
 - Pillow
 - pprofile
 - python-graphviz
-- pydot
 - pyparsing
 - pyzmq
-- rpy2  
+- rpy2
 - scikit-learn
 - scikit-image
 - scipy
@@ -43,3 +42,4 @@ dependencies:
     - jupytercontrib>=0.0.5
     - bs4
     - git+https://github.com/networkx/networkx.git
+    - git+https://github.com/nlhepler/pydot.git
