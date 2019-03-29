@@ -21,7 +21,7 @@ dependencies:
 - numpy
 - pandas
 - patsy
-- pillow
+- Pillow
 - pprofile
 - python-graphviz
 - pydot
