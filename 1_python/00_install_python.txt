@@ -6,6 +6,14 @@ To setup your computer to write programs using the python programming language (
 
 - Install the distribution in your home directory. You do not need any admin privileges for this.
 
+To create the environment, using the Anaconda distribution, used in this trianing please copy and paste the following command in the terminal (or command prompt) and run it: "conda env create -f environment.yml"
+
+To activate this environment, use
+    $ conda activate sci_python
+
+To deactivate an active environment, use
+
+    $ conda deactivate
 
 To start the Jupyter notebook:
 
