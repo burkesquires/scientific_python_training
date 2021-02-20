@@ -1,0 +1,1 @@
+data[data.phylum.str.endswith('bacteria') & (data.value > 1000)]
