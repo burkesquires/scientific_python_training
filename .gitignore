@@ -118,3 +118,4 @@ dmypy.json
 
 # scikit-learn datasets
 4_scikit-learn/datasets/
+.DS_Store
