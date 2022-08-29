@@ -1,0 +1,334 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>3.1.7.1. Relating Gender and IQ &#8212; Scipy lecture notes</title>
+    <link rel="stylesheet" href="../../../../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/gallery.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../../../_static/copybutton.js"></script>
+    <link rel="author" title="About these documents" href="../../../../about.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
+    <link rel="next" title="3.2. Sympy : Symbolic Mathematics in Python" href="../../../sympy.html" />
+    <link rel="prev" title="3.1.6.8. Air fares before and after 9/11" href="../plot_airfare.html" />
+   
+    <link rel="stylesheet"
+	  href="https://unpkg.com/purecss@1.0.0/build/base-min.css">
+
+<script type="text/javascript">
+$(function () {
+    // Highlight the table of content as we scroll
+    sections = {},
+    i        = 0,
+    url	 = document.URL.replace(/#.*$/, ""),
+    current_section = 0;
+
+    // Grab positions of our sections
+    $('.headerlink').each(function(){
+        sections[this.href.replace(url, '')] = $(this).offset().top - 50;
+    });
+
+    $(window).scroll(function(event) {
+	var pos   = $(window).scrollTop();
+
+	// Highlight the current section
+	$('a.internal').parent().removeClass('active');
+        for(i in sections){
+            if(sections[i] > pos){
+		break;
+            };
+	    if($('a.internal[href$="' + i + '"]').is(':visible')){
+		current_section = i;
+	    };
+        }
+	$('a.internal[href$="' + current_section + '"]').parent().addClass('active');
+	$('a.internal[href$="' + current_section + '"]').parent().parent().parent().addClass('active');
+	$('a.internal[href$="' + current_section + '"]').parent().parent().parent().parent().parent().addClass('active');
+    });
+
+});
+</script>
+
+
+  </head><body>
+   <!-- Use the header to add javascript -->
+    
+
+    <script type="text/javascript">
+    // Function to collapse the tip divs
+    function collapse_tip_div(obj){
+	// Update the representation on the tip div based on whether it
+	// has the 'collapsed' css class or not: we only want to
+	// collapse divs that are not already collapsed
+	if($(obj).hasClass("collapsed")) {
+	} else {
+	    $(obj).find("p.summary").remove();
+	    var content = $(obj).text();
+	    var html = $(obj).html();
+
+	    if(content.length > 40) {
+		if ($.browser.msie) {
+		    // We start at '3' to avoid 'tip', as IE
+		    // does not count whitespace
+		    var content = content.substr(3, 50);
+		} else {
+		    // We start at '5' to avoid 'tip '
+		    var content = content.substr(5, 50);
+		}
+	    }
+	    $(obj).html('<p class="summary"><img src="../../../../_static/plus.png">' + content + '...</p>' + html);
+	}
+    }
+    </script>
+
+    <script type="text/javascript">
+    $(function () {
+	$(".tip")
+	    .click(function(event){
+		$(this).toggleClass("collapsed");
+		// Change state of the global button
+		$('div.related li.transparent').removeClass('transparent')
+		$(this).find("p.summary").remove();
+		if($(this).hasClass("collapsed")) {
+		    var content = $(this).text();
+		    var html = $(this).html();
+
+		    if(content.length > 40) {
+			if ($.browser.msie) {
+			    // We start at '3' to avoid 'tip', as IE
+			    // does not count whitespace
+			    var content = content.substr(3, 50);
+			} else {
+			    // We start at '5' to avoid 'tip '
+			    var content = content.substr(5, 50);
+			}
+		    }
+		    $(this).html('<p class="summary"><img src="../../../../_static/plus.png">' + content + '...</p>' + html);
+		}
+		if (event.target.tagName.toLowerCase() != "a") {
+                   return true; //Makes links clickable
+		}
+	});
+    });
+    </script>
+
+
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../sympy.html" title="3.2. Sympy : Symbolic Mathematics in Python"
+             accesskey="N">next</a></li>
+        <li class="right" >
+          <a href="../plot_airfare.html" title="3.1.6.8. Air fares before and after 9/11"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">Scipy lecture notes</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../index.html" >3. Packages and applications</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../../index.html" accesskey="U">3.1. Statistics in Python</a> &#187;</li>
+     
+    <!-- Insert a menu in the navigation bar -->
+    <li class="left">
+	<!-- On click toggle the 'tip' on or off-->
+	<a onclick="$('.tip').each(function (index, obj) {
+			    collapse_tip_div(obj);
+		    });
+		    $('.tip').addClass('collapsed');
+		    $('.left').addClass('transparent');">
+	<img src="../../../../_static/minus.png"
+         alt="Collapse to compact view" style="padding: 1ex;"/>
+	<span class="hiddenlink">Collapse document to compact view</span>
+    </a></li>
+    <li class="right edit_on_github"><a href="https://github.com/scipy-lectures/scipy-lecture-notes/edit/master/packages/statistics/auto_examples/solutions/plot_brain_size.rst">Edit
+    <span class="tooltip">
+	Improve this page:<br/>Edit it on Github.
+    </span>
+    </a>
+    </li>
+
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="sphx-glr-download-link-note admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Click <a class="reference internal" href="#sphx-glr-download-packages-statistics-auto-examples-solutions-plot-brain-size-py"><span class="std std-ref">here</span></a> to download the full example code</p>
+</div>
+<div class="sphx-glr-example-title section" id="relating-gender-and-iq">
+<span id="sphx-glr-packages-statistics-auto-examples-solutions-plot-brain-size-py"></span><h1>3.1.7.1. Relating Gender and IQ<a class="headerlink" href="#relating-gender-and-iq" title="Permalink to this headline">¶</a></h1>
+<p>Going back to the brain size + IQ data, test if the VIQ of male and
+female are different after removing the effect of brain size, height and
+weight.</p>
+<p>Notice that here ‘Gender’ is a categorical value. As it is a non-float
+data type, statsmodels is able to automatically infer this.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pandas</span>
+<div class="newline"></div><span class="kn">from</span> <span class="nn">statsmodels.formula.api</span> <span class="kn">import</span> <a href="https://www.statsmodels.org/stable/generated/statsmodels.formula.api.ols.html#statsmodels.formula.api.ols" title="View documentation for statsmodels.formula.api.ols"><span class="n">ols</span></a>
+<div class="newline"></div>
+<div class="newline"></div><span class="n">data</span> <span class="o">=</span> <a href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.read_csv.html#pandas.read_csv" title="View documentation for pandas.read_csv"><span class="n">pandas</span><span class="o">.</span><span class="n">read_csv</span></a><span class="p">(</span><span class="s1">&#39;../brain_size.csv&#39;</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="s1">&#39;;&#39;</span><span class="p">,</span> <span class="n">na_values</span><span class="o">=</span><span class="s1">&#39;.&#39;</span><span class="p">)</span>
+<div class="newline"></div>
+<div class="newline"></div><span class="n">model</span> <span class="o">=</span> <a href="https://www.statsmodels.org/stable/generated/statsmodels.formula.api.ols.html#statsmodels.formula.api.ols" title="View documentation for statsmodels.formula.api.ols"><span class="n">ols</span></a><span class="p">(</span><span class="s1">&#39;VIQ ~ Gender + MRI_Count + Height&#39;</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">()</span>
+<div class="newline"></div><span class="nb">print</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">summary</span><span class="p">())</span>
+<div class="newline"></div>
+<div class="newline"></div><span class="c1"># Here, we don&#39;t need to define a contrast, as we are testing a single</span>
+<div class="newline"></div><span class="c1"># coefficient of our model, and not a combination of coefficients.</span>
+<div class="newline"></div><span class="c1"># However, defining a contrast, which would then be a &#39;unit contrast&#39;,</span>
+<div class="newline"></div><span class="c1"># will give us the same results</span>
+<div class="newline"></div><span class="nb">print</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">f_test</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]))</span>
+<div class="newline"></div></pre></div>
+</div>
+<p class="sphx-glr-script-out">Out:</p>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>OLS Regression Results
+<div class="newline"></div>==============================================================================
+<div class="newline"></div>Dep. Variable:                    VIQ   R-squared:                       0.246
+<div class="newline"></div>Model:                            OLS   Adj. R-squared:                  0.181
+<div class="newline"></div>Method:                 Least Squares   F-statistic:                     3.809
+<div class="newline"></div>Date:                Thu, 18 Aug 2022   Prob (F-statistic):             0.0184
+<div class="newline"></div>Time:                        10:40:21   Log-Likelihood:                -172.34
+<div class="newline"></div>No. Observations:                  39   AIC:                             352.7
+<div class="newline"></div>Df Residuals:                      35   BIC:                             359.3
+<div class="newline"></div>Df Model:                           3
+<div class="newline"></div>Covariance Type:            nonrobust
+<div class="newline"></div>==================================================================================
+<div class="newline"></div>                     coef    std err          t      P&gt;|t|      [0.025      0.975]
+<div class="newline"></div>----------------------------------------------------------------------------------
+<div class="newline"></div>Intercept        166.6258     88.824      1.876      0.069     -13.696     346.948
+<div class="newline"></div>Gender[T.Male]     8.8524     10.710      0.827      0.414     -12.890      30.595
+<div class="newline"></div>MRI_Count          0.0002   6.46e-05      2.615      0.013    3.78e-05       0.000
+<div class="newline"></div>Height            -3.0837      1.276     -2.417      0.021      -5.674      -0.494
+<div class="newline"></div>==============================================================================
+<div class="newline"></div>Omnibus:                        7.373   Durbin-Watson:                   2.109
+<div class="newline"></div>Prob(Omnibus):                  0.025   Jarque-Bera (JB):                2.252
+<div class="newline"></div>Skew:                           0.005   Prob(JB):                        0.324
+<div class="newline"></div>Kurtosis:                       1.823   Cond. No.                     2.40e+07
+<div class="newline"></div>==============================================================================
+<div class="newline"></div>
+<div class="newline"></div>Warnings:
+<div class="newline"></div>[1] Standard Errors assume that the covariance matrix of the errors is correctly specified.
+<div class="newline"></div>[2] The condition number is large, 2.4e+07. This might indicate that there are
+<div class="newline"></div>strong multicollinearity or other numerical problems.
+<div class="newline"></div>&lt;F test: F=array([[0.68319608]]), p=0.4140878441244722, df_denom=35, df_num=1&gt;
+<div class="newline"></div></pre></div>
+</div>
+<p>Here we plot a scatter matrix to get intuitions on our results.
+This goes beyond what was asked in the exercise</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># This plotting is useful to get an intuitions on the relationships between</span>
+<div class="newline"></div><span class="c1"># our different variables</span>
+<div class="newline"></div>
+<div class="newline"></div><span class="kn">from</span> <span class="nn">pandas.tools</span> <span class="kn">import</span> <span class="n">plotting</span>
+<div class="newline"></div><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<div class="newline"></div>
+<div class="newline"></div><span class="c1"># Fill in the missing values for Height for plotting</span>
+<div class="newline"></div><span class="n">data</span><span class="p">[</span><span class="s1">&#39;Height&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="n">method</span><span class="o">=</span><span class="s1">&#39;pad&#39;</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<div class="newline"></div>
+<div class="newline"></div><span class="c1"># The parameter &#39;c&#39; is passed to plt.scatter and will control the color</span>
+<div class="newline"></div><span class="c1"># The same holds for parameters &#39;marker&#39;, &#39;alpha&#39; and &#39;cmap&#39;, that</span>
+<div class="newline"></div><span class="c1"># control respectively the type of marker used, their transparency and</span>
+<div class="newline"></div><span class="c1"># the colormap</span>
+<div class="newline"></div><span class="n">plotting</span><span class="o">.</span><span class="n">scatter_matrix</span><span class="p">(</span><span class="n">data</span><span class="p">[[</span><span class="s1">&#39;VIQ&#39;</span><span class="p">,</span> <span class="s1">&#39;MRI_Count&#39;</span><span class="p">,</span> <span class="s1">&#39;Height&#39;</span><span class="p">]],</span>
+<div class="newline"></div>                        <span class="n">c</span><span class="o">=</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;Gender&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;Female&#39;</span><span class="p">),</span> <span class="n">marker</span><span class="o">=</span><span class="s1">&#39;o&#39;</span><span class="p">,</span>
+<div class="newline"></div>                        <span class="n">alpha</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;winter&#39;</span><span class="p">)</span>
+<div class="newline"></div>
+<div class="newline"></div><span class="n">fig</span> <span class="o">=</span> <a href="https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.gcf.html#matplotlib.pyplot.gcf" title="View documentation for matplotlib.pyplot.gcf"><span class="n">plt</span><span class="o">.</span><span class="n">gcf</span></a><span class="p">()</span>
+<div class="newline"></div><span class="n">fig</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="s2">&quot;blue: male, green: female&quot;</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">13</span><span class="p">)</span>
+<div class="newline"></div>
+<div class="newline"></div><a href="https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.show.html#matplotlib.pyplot.show" title="View documentation for matplotlib.pyplot.show"><span class="n">plt</span><span class="o">.</span><span class="n">show</span></a><span class="p">()</span>
+<div class="newline"></div></pre></div>
+</div>
+<img alt="../../../../_images/sphx_glr_plot_brain_size_001.png" class="sphx-glr-single-img" src="../../../../_images/sphx_glr_plot_brain_size_001.png" />
+<p><strong>Total running time of the script:</strong> ( 0 minutes  0.328 seconds)</p>
+<div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-packages-statistics-auto-examples-solutions-plot-brain-size-py">
+<div class="sphx-glr-download docutils container">
+<a class="reference download internal" href="../../../../_downloads/plot_brain_size.py" download=""><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">plot_brain_size.py</span></code></a></div>
+<div class="sphx-glr-download docutils container">
+<a class="reference download internal" href="../../../../_downloads/plot_brain_size.ipynb" download=""><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">plot_brain_size.ipynb</span></code></a></div>
+</div>
+<p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.readthedocs.io">Gallery generated by Sphinx-Gallery</a></p>
+<p><div style="clear: both"></div></p>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="../plot_airfare.html"
+                        title="previous chapter">3.1.6.8. Air fares before and after 9/11</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="../../../sympy.html"
+                        title="next chapter">3.2. Sympy : Symbolic Mathematics in Python</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../../../_sources/packages/statistics/auto_examples/solutions/plot_brain_size.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../sympy.html" title="3.2. Sympy : Symbolic Mathematics in Python"
+             >next</a></li>
+        <li class="right" >
+          <a href="../plot_airfare.html" title="3.1.6.8. Air fares before and after 9/11"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">Scipy lecture notes</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../index.html" >3. Packages and applications</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../../index.html" >3.1. Statistics in Python</a> &#187;</li>
+     
+    <!-- Insert a menu in the navigation bar -->
+    <li class="left">
+	<!-- On click toggle the 'tip' on or off-->
+	<a onclick="$('.tip').each(function (index, obj) {
+			    collapse_tip_div(obj);
+		    });
+		    $('.tip').addClass('collapsed');
+		    $('.left').addClass('transparent');">
+	<img src="../../../../_static/minus.png"
+         alt="Collapse to compact view" style="padding: 1ex;"/>
+	<span class="hiddenlink">Collapse document to compact view</span>
+    </a></li>
+    <li class="right edit_on_github"><a href="https://github.com/scipy-lectures/scipy-lecture-notes/edit/master/packages/statistics/auto_examples/solutions/plot_brain_size.rst">Edit
+    <span class="tooltip">
+	Improve this page:<br/>Edit it on Github.
+    </span>
+    </a>
+    </li>
+
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2012,2013,2015,2016,2017,2018,2019,2020,2021,2022.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.7.9.
+    </div>
+  </body>
+</html>

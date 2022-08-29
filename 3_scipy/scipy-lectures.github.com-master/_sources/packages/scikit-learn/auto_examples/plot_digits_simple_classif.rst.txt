@@ -1,0 +1,288 @@
+.. note::
+    :class: sphx-glr-download-link-note
+
+    Click :ref:`here <sphx_glr_download_packages_scikit-learn_auto_examples_plot_digits_simple_classif.py>` to download the full example code
+.. rst-class:: sphx-glr-example-title
+
+.. _sphx_glr_packages_scikit-learn_auto_examples_plot_digits_simple_classif.py:
+
+
+Simple visualization and classification of the digits dataset
+=============================================================
+
+Plot the first few samples of the digits dataset and a 2D representation
+built using PCA, then do a simple classification
+
+
+
+.. code-block:: python
+
+
+    from sklearn.datasets import load_digits
+    digits = load_digits()
+
+
+
+
+
+
+
+Plot the data: images of digits
+-------------------------------
+
+Each data in a 8x8 image
+
+
+
+.. code-block:: python
+
+    from matplotlib import pyplot as plt
+    fig = plt.figure(figsize=(6, 6))  # figure size in inches
+    fig.subplots_adjust(left=0, right=1, bottom=0, top=1, hspace=0.05, wspace=0.05)
+
+    for i in range(64):
+        ax = fig.add_subplot(8, 8, i + 1, xticks=[], yticks=[])
+        ax.imshow(digits.images[i], cmap=plt.cm.binary, interpolation='nearest')
+        # label the image with the target value
+        ax.text(0, 7, str(digits.target[i]))
+
+
+
+
+
+.. image:: /packages/scikit-learn/auto_examples/images/sphx_glr_plot_digits_simple_classif_001.png
+    :class: sphx-glr-single-img
+
+
+
+
+Plot a projection on the 2 first principal axis
+------------------------------------------------
+
+
+
+.. code-block:: python
+
+
+    plt.figure()
+
+    from sklearn.decomposition import PCA
+    pca = PCA(n_components=2)
+    proj = pca.fit_transform(digits.data)
+    plt.scatter(proj[:, 0], proj[:, 1], c=digits.target, cmap="Paired")
+    plt.colorbar()
+
+
+
+
+
+.. image:: /packages/scikit-learn/auto_examples/images/sphx_glr_plot_digits_simple_classif_002.png
+    :class: sphx-glr-single-img
+
+
+
+
+Classify with Gaussian naive Bayes
+----------------------------------
+
+
+
+.. code-block:: python
+
+
+    from sklearn.naive_bayes import GaussianNB
+    from sklearn.model_selection import train_test_split
+
+    # split the data into training and validation sets
+    X_train, X_test, y_train, y_test = train_test_split(digits.data, digits.target)
+
+    # train the model
+    clf = GaussianNB()
+    clf.fit(X_train, y_train)
+
+    # use the model to predict the labels of the test data
+    predicted = clf.predict(X_test)
+    expected = y_test
+
+    # Plot the prediction
+    fig = plt.figure(figsize=(6, 6))  # figure size in inches
+    fig.subplots_adjust(left=0, right=1, bottom=0, top=1, hspace=0.05, wspace=0.05)
+
+    # plot the digits: each image is 8x8 pixels
+    for i in range(64):
+        ax = fig.add_subplot(8, 8, i + 1, xticks=[], yticks=[])
+        ax.imshow(X_test.reshape(-1, 8, 8)[i], cmap=plt.cm.binary,
+                  interpolation='nearest')
+
+        # label the image with the target value
+        if predicted[i] == expected[i]:
+            ax.text(0, 7, str(predicted[i]), color='green')
+        else:
+            ax.text(0, 7, str(predicted[i]), color='red')
+
+
+
+
+
+.. image:: /packages/scikit-learn/auto_examples/images/sphx_glr_plot_digits_simple_classif_003.png
+    :class: sphx-glr-single-img
+
+
+
+
+Quantify the performance
+------------------------
+
+First print the number of correct matches
+
+
+
+.. code-block:: python
+
+    matches = (predicted == expected)
+    print(matches.sum())
+
+
+
+
+.. rst-class:: sphx-glr-script-out
+
+ Out:
+
+ .. code-block:: none
+
+    388
+
+
+The total number of data points
+
+
+
+.. code-block:: python
+
+    print(len(matches))
+
+
+
+
+.. rst-class:: sphx-glr-script-out
+
+ Out:
+
+ .. code-block:: none
+
+    450
+
+
+And now, the ration of correct predictions
+
+
+
+.. code-block:: python
+
+    matches.sum() / float(len(matches))
+
+
+
+
+
+
+
+Print the classification report
+
+
+
+.. code-block:: python
+
+    from sklearn import metrics
+    print(metrics.classification_report(expected, predicted))
+
+
+
+
+
+.. rst-class:: sphx-glr-script-out
+
+ Out:
+
+ .. code-block:: none
+
+    precision    recall  f1-score   support
+
+               0       1.00      1.00      1.00        51
+               1       0.62      0.93      0.75        41
+               2       0.94      0.70      0.80        46
+               3       0.93      0.87      0.90        47
+               4       1.00      0.84      0.91        43
+               5       0.86      0.93      0.89        40
+               6       0.98      0.98      0.98        45
+               7       0.86      0.96      0.91        52
+               8       0.65      0.69      0.67        49
+               9       0.96      0.69      0.81        36
+
+        accuracy                           0.86       450
+       macro avg       0.88      0.86      0.86       450
+    weighted avg       0.88      0.86      0.86       450
+
+
+Print the confusion matrix
+
+
+
+.. code-block:: python
+
+    print(metrics.confusion_matrix(expected, predicted))
+
+    plt.show()
+
+
+
+
+
+.. rst-class:: sphx-glr-script-out
+
+ Out:
+
+ .. code-block:: none
+
+    [[51  0  0  0  0  0  0  0  0  0]
+     [ 0 38  0  0  0  0  0  0  3  0]
+     [ 0  5 32  0  0  0  0  0  9  0]
+     [ 0  1  0 41  0  2  0  0  2  1]
+     [ 0  2  1  0 36  0  1  2  1  0]
+     [ 0  1  0  0  0 37  0  1  1  0]
+     [ 0  0  1  0  0  0 44  0  0  0]
+     [ 0  0  0  0  0  1  0 50  1  0]
+     [ 0 12  0  0  0  1  0  2 34  0]
+     [ 0  2  0  3  0  2  0  3  1 25]]
+
+
+**Total running time of the script:** ( 0 minutes  1.639 seconds)
+
+
+.. _sphx_glr_download_packages_scikit-learn_auto_examples_plot_digits_simple_classif.py:
+
+
+.. only :: html
+
+ .. container:: sphx-glr-footer
+    :class: sphx-glr-footer-example
+
+
+
+  .. container:: sphx-glr-download
+
+     :download:`Download Python source code: plot_digits_simple_classif.py <plot_digits_simple_classif.py>`
+
+
+
+  .. container:: sphx-glr-download
+
+     :download:`Download Jupyter notebook: plot_digits_simple_classif.ipynb <plot_digits_simple_classif.ipynb>`
+
+
+.. only:: html
+
+ .. rst-class:: sphx-glr-signature
+
+    `Gallery generated by Sphinx-Gallery <https://sphinx-gallery.readthedocs.io>`_
