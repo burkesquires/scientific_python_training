@@ -61,8 +61,7 @@ def load_titanic(test_size=.25, feature_skip_tuple=(), random_state=1999):
         strings = {k: line_dict[k] for k in string_keys}
         numeric_labels[n] = line_dict["survived"]
 
-    sss = StratifiedShuffleSplit(n_splits=1, test_size=test_size,
-                                 random_state=12) #removed n_ints=1
+    sss = StratifiedShuffleSplit(n_iter=1, test_size=test_size, random_state=12)
     # This is a weird way to get the indices but it works
     train_idx = None
     test_idx = None
